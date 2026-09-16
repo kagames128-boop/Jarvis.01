@@ -1,48 +1,16 @@
-<!doctype html>
-<html lang="pt-BR">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#07090d">
-<link rel="manifest" href="manifest.json">
-<title>JARVIS</title>
-<style>
-*{box-sizing:border-box}body{margin:0;background:#05070b;color:#eee;font-family:Arial,sans-serif;min-height:100vh}
-main{max-width:650px;margin:auto;padding:24px 18px;display:flex;flex-direction:column;min-height:100vh}
-h1{text-align:center;letter-spacing:9px;margin:20px 0 4px;font-size:30px}.status{text-align:center;color:#d33;font-size:12px;letter-spacing:2px}
-.orb{width:150px;height:150px;border-radius:50%;margin:35px auto 20px;border:1px solid #a00;box-shadow:0 0 25px #700, inset 0 0 35px #400;display:grid;place-items:center}
-.orb span{font-size:45px}.chat{background:#10151c;border-radius:18px;padding:18px;min-height:180px;line-height:1.5;white-space:pre-wrap}
-.row{display:flex;gap:10px;margin-top:14px}button{border:0;border-radius:14px;padding:15px;background:#a40000;color:white;font-weight:bold;font-size:15px;flex:1}button:active{transform:scale(.98)}
-input{width:100%;padding:15px;border-radius:12px;border:1px solid #444;background:#111;color:#fff;margin-top:12px}
-small{color:#8d949d;line-height:1.4;margin-top:14px}
-</style></head>
-<body><main>
-<h1>JARVIS</h1><div class="status" id="status">SISTEMAS ONLINE</div>
-<div class="orb"><span>◉</span></div>
-<div class="chat" id="chat">Olá. Sistemas iniciados.\n\nToque em FALAR e diga seu comando.</div>
-<div class="row"><button id="mic">🎙 FALAR</button><button id="speak">🔊 REPETIR</button></div>
-<input id="text" placeholder="Digite um comando...">
-<button id="send" style="margin-top:10px">ENVIAR</button>
-<small>Esta é a versão web inicial. Para conversar com um modelo de IA, configure uma conexão de backend. Não coloque uma chave secreta de API em uma página pública.</small>
-</main>
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#050608"><link rel="manifest" href="manifest.json"><title>JARVIS 2.0</title><style>
+body{margin:0;background:#050608;color:#f5f5f5;font-family:Arial,sans-serif}.wrap{max-width:720px;margin:auto;padding:28px 18px}.brand{text-align:center;letter-spacing:10px;font-size:42px;font-weight:bold}.sub{text-align:center;color:#f33;letter-spacing:4px}.orb{width:230px;height:230px;border:2px solid #e00000;border-radius:50%;margin:55px auto 35px;display:grid;place-items:center;box-shadow:0 0 40px #9008,inset 0 0 45px #6008}.core{width:32px;height:32px;border:4px solid white;border-radius:50%}.status{background:#10141a;border-radius:22px;padding:22px;min-height:150px;white-space:pre-wrap;line-height:1.55}.row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}.btn{border:0;border-radius:18px;padding:20px;background:#d00000;color:white;font-size:18px;font-weight:bold}textarea{width:100%;margin-top:16px;background:#0b0c0f;color:white;border:2px solid #34383e;border-radius:18px;padding:18px;font-size:17px;min-height:75px;box-sizing:border-box}.send{width:100%;margin-top:14px}.small{text-align:center;color:#9da3ad;font-size:12px;margin-top:16px}</style></head><body><div class="wrap">
+<div class="brand">JARVIS</div><div class="sub">SISTEMAS ONLINE • V2</div><div class="orb"><div class="core"></div></div>
+<div class="status" id="status">Olá. Sistemas iniciados.\n\nEstou pronto para conversar.</div>
+<div class="row"><button class="btn" id="talk">🎙️ FALAR</button><button class="btn" id="repeat">🔊 REPETIR</button></div>
+<textarea id="input" placeholder="Digite um comando..."></textarea><button class="btn send" id="send">ENVIAR</button>
+<div class="small">JARVIS 2.0 • chave da IA protegida no servidor</div></div>
 <script>
-const chat=document.getElementById('chat'), status=document.getElementById('status');
-let last="Olá. Sistemas iniciados.";
-function reply(t){
- t=t.toLowerCase();
- if(t.includes("youtube")){location.href="https://www.youtube.com";return "Abrindo o YouTube."}
- if(t.includes("google")){location.href="https://www.google.com";return "Abrindo o Google."}
- if(t.startsWith("pesquisar ")){location.href="https://www.google.com/search?q="+encodeURIComponent(t.slice(11));return "Pesquisando."}
- return "Recebi seu comando: "+t+"\\n\\nNesta primeira versão, os comandos locais estão ativos. O cérebro de IA pode ser conectado a um backend seguro na próxima etapa.";
-}
-function run(t){if(!t)return;last=reply(t);chat.textContent="Você: "+t+"\\n\\nJARVIS: "+last;speechSynthesis.speak(new SpeechSynthesisUtterance(last))}
-document.getElementById('send').onclick=()=>{let x=document.getElementById('text');run(x.value);x.value=""};
-document.getElementById('speak').onclick=()=>speechSynthesis.speak(new SpeechSynthesisUtterance(last));
-document.getElementById('mic').onclick=()=>{
- const R=window.SpeechRecognition||window.webkitSpeechRecognition;
- if(!R){alert("Seu navegador não oferece reconhecimento de voz.");return}
- const r=new R();r.lang="pt-BR";status.textContent="OUVINDO...";
- r.onresult=e=>{status.textContent="SISTEMAS ONLINE";run(e.results[0][0].transcript)}
- r.onerror=()=>status.textContent="SISTEMAS ONLINE";r.onend=()=>status.textContent="SISTEMAS ONLINE";r.start();
-};
-if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+const BACKEND_URL=localStorage.getItem("jarvis_backend_url")||"COLOQUE_A_URL_DO_BACKEND_AQUI";let last="";
+const s=document.getElementById("status"),i=document.getElementById("input");
+function speak(t){if("speechSynthesis"in window){speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(t);u.lang="pt-BR";u.rate=.98;u.pitch=.9;speechSynthesis.speak(u)}}
+async function ask(t){t=t.trim();if(!t)return;if(BACKEND_URL.includes("COLOQUE_A_URL")){s.textContent="O cérebro de IA ainda não foi conectado.\n\nConfigure a URL do backend.";return}s.textContent="JARVIS está processando...";try{let r=await fetch(BACKEND_URL.replace(/\/$/,"")+"/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:t})});let d=await r.json();if(!r.ok)throw Error(d.error||"Erro no servidor");last=d.answer||"Sem resposta.";s.textContent="Você: "+t+"\n\nJARVIS: "+last;speak(last)}catch(e){s.textContent="JARVIS: "+e.message+"\n\nVerifique o backend."}}
+send.onclick=()=>ask(i.value);i.onkeydown=e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();ask(i.value)}};repeat.onclick=()=>last&&speak(last);
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(SR){let r=new SR();r.lang="pt-BR";r.onresult=e=>{i.value=e.results[0][0].transcript;ask(i.value)};talk.onclick=()=>{s.textContent="Estou ouvindo...";r.start()}}else talk.onclick=()=>s.textContent="Reconhecimento de voz não disponível neste navegador.";
+if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js");
 </script></body></html>
