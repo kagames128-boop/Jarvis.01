@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#07090d">
+<link rel="manifest" href="manifest.json">
+<title>JARVIS</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#05070b;color:#eee;font-family:Arial,sans-serif;min-height:100vh}
+main{max-width:650px;margin:auto;padding:24px 18px;display:flex;flex-direction:column;min-height:100vh}
+h1{text-align:center;letter-spacing:9px;margin:20px 0 4px;font-size:30px}.status{text-align:center;color:#d33;font-size:12px;letter-spacing:2px}
+.orb{width:150px;height:150px;border-radius:50%;margin:35px auto 20px;border:1px solid #a00;box-shadow:0 0 25px #700, inset 0 0 35px #400;display:grid;place-items:center}
+.orb span{font-size:45px}.chat{background:#10151c;border-radius:18px;padding:18px;min-height:180px;line-height:1.5;white-space:pre-wrap}
+.row{display:flex;gap:10px;margin-top:14px}button{border:0;border-radius:14px;padding:15px;background:#a40000;color:white;font-weight:bold;font-size:15px;flex:1}button:active{transform:scale(.98)}
+input{width:100%;padding:15px;border-radius:12px;border:1px solid #444;background:#111;color:#fff;margin-top:12px}
+small{color:#8d949d;line-height:1.4;margin-top:14px}
+</style></head>
+<body><main>
+<h1>JARVIS</h1><div class="status" id="status">SISTEMAS ONLINE</div>
+<div class="orb"><span>◉</span></div>
+<div class="chat" id="chat">Olá. Sistemas iniciados.\n\nToque em FALAR e diga seu comando.</div>
+<div class="row"><button id="mic">🎙 FALAR</button><button id="speak">🔊 REPETIR</button></div>
+<input id="text" placeholder="Digite um comando...">
+<button id="send" style="margin-top:10px">ENVIAR</button>
+<small>Esta é a versão web inicial. Para conversar com um modelo de IA, configure uma conexão de backend. Não coloque uma chave secreta de API em uma página pública.</small>
+</main>
+<script>
+const chat=document.getElementById('chat'), status=document.getElementById('status');
+let last="Olá. Sistemas iniciados.";
+function reply(t){
+ t=t.toLowerCase();
+ if(t.includes("youtube")){location.href="https://www.youtube.com";return "Abrindo o YouTube."}
+ if(t.includes("google")){location.href="https://www.google.com";return "Abrindo o Google."}
+ if(t.startsWith("pesquisar ")){location.href="https://www.google.com/search?q="+encodeURIComponent(t.slice(11));return "Pesquisando."}
+ return "Recebi seu comando: "+t+"\\n\\nNesta primeira versão, os comandos locais estão ativos. O cérebro de IA pode ser conectado a um backend seguro na próxima etapa.";
+}
+function run(t){if(!t)return;last=reply(t);chat.textContent="Você: "+t+"\\n\\nJARVIS: "+last;speechSynthesis.speak(new SpeechSynthesisUtterance(last))}
+document.getElementById('send').onclick=()=>{let x=document.getElementById('text');run(x.value);x.value=""};
+document.getElementById('speak').onclick=()=>speechSynthesis.speak(new SpeechSynthesisUtterance(last));
+document.getElementById('mic').onclick=()=>{
+ const R=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(!R){alert("Seu navegador não oferece reconhecimento de voz.");return}
+ const r=new R();r.lang="pt-BR";status.textContent="OUVINDO...";
+ r.onresult=e=>{status.textContent="SISTEMAS ONLINE";run(e.results[0][0].transcript)}
+ r.onerror=()=>status.textContent="SISTEMAS ONLINE";r.onend=()=>status.textContent="SISTEMAS ONLINE";r.start();
+};
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script></body></html>
